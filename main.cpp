@@ -1,64 +1,44 @@
 #include <iostream>
+#include <vector>
 #include <cmath>
 #include <iomanip>
-
 using namespace std;
 
-double func1(double x)
+double f(double i)
 {
-    return (6435 * pow(x,8) -12012 * pow(x, 6) + 6930 * pow(x,4) - 1260 * pow(x,2) + 35)/128;
+  return cos(i)-i;
 }
 
-double func(double x)
+int FP_method(float left_boundary, float right_boundary)
 {
-  return func1(x);
-}
+    double XL=left_boundary;
+    double XR=right_boundary;
+    double Tolerance=pow(10.0,-8.0);
+    double ERROR=abs(XL-XR);
+    double XM=0;
+    double last=0;
+    int i=1;
 
-double div(double x)
-{
-    double dx=0.0000001;
-    return (func(x+dx)-func(x))/dx;
-}
-
-
-
-double NRM(double X0)
-{
-
-    double Xi,Xi1,ERROR=10000,TOLERANCE=pow(10.0,-8.0);
-    Xi=X0;
-    while(ERROR>TOLERANCE)
+    while(ERROR>Tolerance)
     {
-        Xi1=Xi-(func(Xi)/div(Xi));
-        ERROR=abs((Xi1-Xi)/Xi1);
-        Xi=Xi1;
+    last=XM;
+    XM=(XL*f(XR)-XR*f(XL))/(f(XR)-f(XL));
+
+    if(f(XM)*f(XL)>0) XL=XM;
+    else XR=XM;
+
+    cout << "XR= " << setprecision(16) << XR << "\t" << "XL= " << setprecision(16) << XL << "\t" << "XM= " << XM << endl;
+
+
+    ERROR=abs((XM-last)/XM);
+    // cout << i << ": " << setprecision(8) << XM << " Error: " << ERROR << endl;
+    i++;
     }
-    return Xi1;
+    cout << endl << setprecision(8) << XM;
 }
 
-double LongNRM(double start,double finish)
-{
-    double last_result=0,result;
-    for(double i=start;i<=finish;i+=0.01)
-    {
-        result=NRM(i);
-        if(result!=last_result)
-        {
-            cout << result << "\n";
-            last_result=result;
-        }
-    }
-}
 int main()
 {
-    //cout << "Hello world!\n" << "Give X0:";
-    //double X0;
-    //cin >> X0 ;
-    //double result=NRM(X0);
-    double result=LongNRM(0,1);
-    //cout << "result: ";
-    cout << setprecision(8) << result;
+    FP_method(0,1);
     return 0;
 }
-
-
